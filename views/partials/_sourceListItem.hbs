@@ -1,0 +1,6 @@
+<a class="list-group-item text-truncate py-3{{#if active}} active{{else}} list-group-item-action{{/if}}"{{#unless active}} href="?v={{ version.index }}&s={{ @index }}"{{/unless}}>
+    <span class="mr-1">{{ version.string }}</span>
+    {{#each tags}}
+        <span class="badge badge-secondary mr-1">{{ string }}</span>
+    {{/each}}
+</a>

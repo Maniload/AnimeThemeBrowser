@@ -1,0 +1,16 @@
+<h3 class="my-4">All themes of "{{username}}" ({{total_string}}):</h3>
+<div id="theme-list" class="list-group mb-3">
+    <div id="theme-list-no-results" class="list-group-item px-3 py-3 text-center{{#if themes}} d-none{{/if}}">
+        <h2>No results!</h2>
+    </div>
+    {{#each themes}}
+        <a class="theme-list-result list-group-item list-group-item-action flex-column align-items-start" href="/watch/{{this.theme_id}}">
+            <img src="{{this.image}}" class="img-fluid rounded float-left mr-3 img-cover">
+            <div class="d-flex justify-content-between">
+                <h5 class="mb-1"><span class="badge badge-secondary mr-2 text-monospace">{{this.type_string}}</span>{{this.theme_title}}</h5>
+                <small class="text-muted text-uppercase">THEME</small>
+            </div>
+            <p class="text-muted mb-1">{{this.anime_title}}</p>
+        </a>
+    {{/each}}
+</div>

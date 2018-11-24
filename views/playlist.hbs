@@ -1,0 +1,79 @@
+<div class="position-relative mt-4">
+    <video id="player" controls autoplay class="w-100 h-100 position-absolute"></video>
+    <canvas id="canvas" width="1920" height="1080" class="w-100 position-relative"></canvas>
+</div>
+<h3 class="my-4">Playlist:</h3>
+<div id="theme-list" class="accordion list-group mb-3">
+    {{#each themes}}
+        <div class="card" data-rank="{{this.rank}}">
+            <a class="card-header list-group-item list-group-item-action" data-toggle="collapse" data-parent="#theme-list" data-target="#item-{{this.theme_id}}" href>
+                <div class="d-flex flex-row align-items-start collapsed">
+                    <h1 class="rank-display align-self-center mr-4">#{{this.rank}}</h1>
+                    <img src="{{this.image}}" class="img-fluid rounded float-left mr-4 img-cover d-none d-md-block">
+                    <div class="d-flex flex-column align-self-center justify-content-between mr-auto">
+                        <h5 class="mb-1">{{this.theme_title}}</h5>
+                        <p class="text-muted mb-1">{{this.anime_title}}</p>
+                    </div>
+                    <small class="align-self-center">{{this.type_string}}</small>
+                </div>
+            </a>
+            <div id="item-{{this.theme_id}}" class="collapse" data-parent="#theme-list">
+                <div class="card-body">
+                    <form>
+                        <div class="form-row">
+                            <div class="form-group col-12 col-md-6">
+                                <label for="series-{{this.theme_id}}">Series Title</label>
+                                <div class="input-group">
+                                    <input type="text" id="series-{{this.theme_id}}" class="form-control series-input" value="{{this.anime_title}}">
+                                    {{#if this.aliases}}
+                                        <div class="input-group-append alias-select">
+                                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Aliases</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item">{{this.anime_title}}</a>
+                                                <div role="separator" class="dropdown-divider"></div>
+                                                {{#each this.aliases}}
+                                                    <a class="dropdown-item">{{this}}</a>
+                                                {{/each}}
+                                            </div>
+                                        </div>
+                                    {{/if}}
+                                </div>
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="series-info-{{this.theme_id}}">Series Info</label>
+                                <input type="text" id="series-info-{{this.theme_id}}" class="form-control series-info-input" value="{{this.season_string}}">
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="theme-{{this.theme_id}}">Theme Title</label>
+                                <input type="text" id="theme-{{this.theme_id}}" class="form-control theme-input" value="{{this.theme_title}}">
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="theme-info-{{this.theme_id}}">Theme Info</label>
+                                <input type="text" id="theme-info-{{this.theme_id}}" class="form-control theme-info-input" value="{{this.type_string}}">
+                            </div>
+                            <div class="form-group col-6 col-md-3">
+                                <label for="rank-{{this.theme_id}}">Rank</label>
+                                <div class="input-group">
+                                    <input id="rank-{{this.theme_id}}" class="form-control rank-input" type="number" value="{{this.rank}}">
+                                    <div class="input-group-append">
+                                        <button class="rank-submit btn btn-primary" type="button">Update</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-6 col-md-3">
+                                <label for="rank-info-{{this.theme_id}}">Rank Info</label>
+                                <input type="text" id="rank-info-{{this.theme_id}}" class="form-control rank-info-input">
+                            </div>
+                            <div class="form-group col-6 col-md-3">
+                                <label for="render-button">Actions</label>
+                                <button id="render-button" class="btn btn-primary form-control render-button" type="button">Preview</button>
+                            </div>
+                            <input class="url-input" type="hidden" value="{{this.url}}">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {{/each}}
+</div>
+<script defer src="/static/js/render.js"></script>

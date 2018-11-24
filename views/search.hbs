@@ -1,0 +1,45 @@
+<h3 class="my-4">Search results{{#if query}} for "{{query}}" {{/if}} ({{total_string}}):</h3>
+<form action="/search">
+    <nav>
+        <div class="row">
+            <div class="form-inline col-12 mb-3">
+                <div class="form-group col-sm-auto col-12 px-0 mr-2">
+                    <label class="mr-2" for="query-input">Search</label>
+                    <input id="query-input" class="form-control" type="search" placeholder="Search Query" name="query"{{#if query}} value="{{query}}"{{/if}}>
+                </div>
+                <input type="submit" id="query-submit" class="btn btn-primary mr-sm-auto" value="Search">
+
+                {{> _pagination}}
+            </div>
+        </div>
+    </nav>
+    <div id="theme-list" class="list-group mb-3">
+        <div id="theme-list-no-results" class="list-group-item px-3 py-3 text-center{{#if total_pages}} d-none{{/if}}">
+            <h2>No results!</h2>
+        </div>
+        {{#each results.series}}
+            {{> _seriesListItem}}
+            <div class="list-group-item">
+                <h5>Themes:</h5>
+                <div class="list-group">
+                    {{#each this.themes.sample}}
+                        {{> _themeListItemSmall}}
+                    {{/each}}
+                    {{#if this.themes.missing}}
+                        <small class="text-uppercase mt-2"><a href="/series/{{this.anime_id}}">{{this.themes.missing}} more...</a></small>
+                    {{/if}}
+                </div>
+            </div>
+        {{/each}}
+        {{#each results.themes}}
+            {{> _themeListItem}}
+        {{/each}}
+    </div>
+    <nav>
+        <div class="row">
+            <div class="form-inline col-12 mb-3 justify-content-end">
+                {{> _pagination}}
+            </div>
+        </div>
+</nav>
+</form>

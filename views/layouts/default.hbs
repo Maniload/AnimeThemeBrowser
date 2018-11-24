@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#00bc8c">
+
+    <title>{{#if pageTitle}}{{ pageTitle }} - {{/if}}Anime Theme Browser</title>
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/default.css">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/favicon/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#da532c">
+</head>
+<body style="padding-top: 72px; padding-bottom: 60px;">
+    <nav id="header" class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="/img/icon.svg" width="30" height="30" class="d-inline-block align-top mr-2">
+                Anime Theme Browser
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/search">
+                            <i class="material-icons inline-icon mr-1">music_note</i>
+                            <span>Browse</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/series">
+                            <i class="material-icons inline-icon mr-1">tv</i>
+                            <span>Series</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/playlist">
+                            <i class="material-icons inline-icon mr-1">playlist_play</i>
+                            <span>Playlist</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <form class="form-inline my-2 my-lg-0 dropdown">
+                    <input id="quick-searchController" class="form-control mr-sm-2 dropdown-toggle" data-toggle="dropdown" type="searchController" placeholder="Quick Search" aria-label="Search">
+                    <div id="quick-searchController-results" class="dropdown-menu">
+                        <h6 id="quick-searchController-placeholder" class="dropdown-header">Search results will show up here</h6>
+                        <h6 id="quick-searchController-no-results" class="dropdown-header" style="display: none;">Nothing found</h6>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {{{body}}}
+    </div>
+
+    <footer id="footer" class="footer bg-light">
+        <div class="container">
+            <div class="row justify-content-between">
+                <div class="col-sm-auto col-12">
+                    All data on this site is taken from <a href="https://reddit.com/r/AnimeThemes">/r/AnimeThemes</a>.
+                </div>
+                <div class="col-sm-auto col-12">
+                    Made by <a href="https://twitter.com/Maniload">Maniload</a>.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/popper.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
+    <script src="/js/base.js"></script>
+    <script src="/js/quick-searchController.js"></script>
+</body>
+</html>

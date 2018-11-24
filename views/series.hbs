@@ -1,0 +1,40 @@
+<h3 class="my-4">All series<span id="series-count"> ({{pagination.totalString}})</span>:</h3>
+<nav>
+    <div class="row">
+        <div class="form-inline col-12 mb-3">
+            <div class="form-group col-sm-auto col-12 px-0 mr-sm-2">
+                <label class="mr-2" for="order-select">Order</label>
+                <select id="order-select" class="custom-select">
+                    <option value="anime_title-asc" selected>Title (A to Z)</option>
+                    <option value="anime_title-desc">Title (Z to A)</option>
+                    <option value="season-desc">Season (New to Old)</option>
+                    <option value="season-asc">Season (Old to New)</option>
+                </select>
+            </div>
+
+            <div class="form-group col-sm-auto col-12 px-0 mr-sm-auto">
+                <label class="mr-2" for="query-input">Search</label>
+                <input id="query-input" class="form-control" type="searchController" placeholder="Search Query">
+            </div>
+
+            {{> _pagination pagination}}
+        </div>
+    </div>
+</nav>
+<div id="series-list" class="list-group mb-3">
+    <div id="series-list-no-results" class="list-group-item px-3 py-3 text-center{{#if series}} d-none{{/if}}">
+        <h2>No results!</h2>
+    </div>
+    {{#each series}}
+        {{> _seriesListItem}}
+    {{/each}}
+</div>
+<nav>
+    <div class="row">
+        <div class="form-inline col-12 mb-3 justify-content-end">
+            {{> _pagination pagination}}
+        </div>
+    </div>
+</nav>
+
+<script defer src="/js/series.js"></script>
