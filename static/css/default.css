@@ -12,6 +12,8 @@ hr {
 }
 canvas {
     pointer-events: none;
+    top: 0;
+    left: 0;
 }
 a {
     cursor: pointer;

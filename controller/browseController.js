@@ -1,73 +1,88 @@
 const async = require("async");
-const db = require("../db");
+const pagination = require("../util/pagination");
 
 const Series = require("../models/series");
+const Theme = require("../models/theme");
 
-// exports.apiSearch = function (req, res) {
-//
-//     let limit = req.query.limit || 10;
-//     let offset = req.query.offset || 0;
-//     let query = req.query.query || null;
-//     let order = validateOrder(req.query.order) || "asc";
-//
-//     search(limit, offset, query, order).then((data) => {
-//         res.json(data);
-//     }, (err) => {
-//         console.log(err);
-//         res.sendStatus(500);
-//     });
-//
-// };
+exports.browse = function(req, res) {
+    let query = req.query.query,
+        limit = Math.min(Math.max(1, +(req.query.limit || 30))),
+        offset = Math.max(+(req.query.offset || 0));
 
-exports.search = function(query, callback) {
-    if (query) {
-        query = "%" + query + "%";
-    }
+    let queryDocument = query ? {
+        $or: [
+            {
+                title: {
+                    $regex: new RegExp(".*\\Q" + query + "\\E.*"),
+                    $options: "i"
+                }
+            },
+            {
+                aliases: {
+                    $regex: new RegExp(".*\\Q" + query + "\\E.*"),
+                    $options: "i"
+                }
+            }
+        ]
+    } : {};
 
-    let limit = 30, offset = 0;
+    let time = Date.now();
 
     async.waterfall([
         searchSeries,
         searchThemes
-    ], callback);
+    ], (err, results) => {
+        if (err) {
+            console.error(err);
+            res.sendStatus(500);
+            return;
+        }
+
+        console.log("Took " + (Date.now() - time));
+
+        res.render("browse", results);
+    });
 
     function searchSeries(callback) {
-        let stmt = Series.query().leftJoin(Alias.table, function () {
-            return this.using(db.knex.raw("(`anime_id`)"));
-        });
-        if (query) {
-            stmt
-                .where(Series.fields.title, "like", query)
-                .orWhere(Alias.fields.alias, "like", query)
-        }
-        stmt
-            .groupBy(Series.fields.id)
-            .orderBy(Series.fields.title);
-
         async.parallel({
-            part: (callback) => {
+            series: (callback) => {
                 async.waterfall([
-                    function (callback) {
-                        stmt
-                            .clone()
+                    (callback) => {
+                        Series
+                            .find(queryDocument)
                             .limit(limit)
-                            .offset(offset)
-                            .asCallback(callback);
+                            .skip(offset)
+                            .sort("title")
+                            .exec(callback);
                     },
-                    function (rows, callback) {
-                        async.map(rows, Series.build.bind(Series), callback);
+                    (series, callback) => {
+                        async.map(series, (series, callback) => {
+                            async.parallel({
+                                sample: (callback) => {
+                                    Theme
+                                        .find({
+                                            series: series.id
+                                        })
+                                        .limit(2)
+                                        .sort("type index")
+                                        .exec(callback);
+                                },
+                                total: (callback) => {
+                                    Theme.countDocuments({
+                                        series: series.id
+                                    }, callback);
+                                }
+                            }, (err, themes) => {
+                                themes.missing = Math.max(0, themes.total - 2);
+                                series.themes = themes;
+                                callback(err, series);
+                            });
+                        }, callback);
                     }
                 ], callback);
             },
             total: (callback) => {
-                let temp = db.knex().from(stmt).count("*");
-
-                console.log(temp.toString());
-
-                temp.then(function (rows) {
-                        return rows[0]["count(*)"];
-                    })
-                    .asCallback(callback);
+                Series.countDocuments(queryDocument, callback);
             }
         }, callback);
     }
@@ -75,29 +90,19 @@ exports.search = function(query, callback) {
     function searchThemes(foundSeries, callback) {
         let foundThemes = [];
 
-        if (foundSeries.part.length < 30) {
+        if (foundSeries.series.length < 30) {
 
         }
 
-        console.log(foundSeries.part);
-
-        let temp;
-
-        try {
-            temp = {
-                results: {
-                    series: foundSeries.part,
-                    themes: foundThemes
-                },
-                total: foundSeries.total
-            };
-        } catch (e) {
-            console.log(e);
-        }
-
-        console.log(temp);
-
-        callback(null, temp);
+        callback(null, {
+            results: {
+                series: foundSeries.series,
+                themes: foundThemes
+            },
+            pagination: pagination(limit, offset, foundSeries.total),
+            query: query,
+            pageTitle: "Browse"
+        });
     }
 
     // if (mode === modes.MIXED || mode === modes.SERIES) {

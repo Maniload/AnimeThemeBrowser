@@ -12,7 +12,6 @@
     - Seperate themes and series
     - Make _5 more..._ clickable (redirect to full search)
 - `500` default page
-- Push onto _GitHub_
 - Single-Page-Application
   - [require.js](http://requirejs.org) on the front-end?
 - Artists
@@ -26,6 +25,8 @@
 
 ### Database
 - Fully convert to _MongoDB_ / _Mongoose_
+    - Browse page
+    - Quick search
   
 ### Scraper
 - Make it an all inclusive CRON-job

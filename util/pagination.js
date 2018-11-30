@@ -15,10 +15,12 @@ module.exports = function (limit, offset, total) {
 
     if (page > 0) {
         pagination.previousPage = page - 1;
+        pagination.previousOffset = offset - limit;
     }
 
     if (total > limit) {
         pagination.nextPage = page + 1;
+        pagination.nextOffset = offset + limit;
     }
 
     return pagination;

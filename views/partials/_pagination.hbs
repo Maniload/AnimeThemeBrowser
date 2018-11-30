@@ -1,5 +1,5 @@
 <div class="col-md-auto col-12 d-flex justify-content-center mt-md-0 mt-sm-2 mt-0">
-    <button class="page-previous d-inline-flex btn btn-primary"{{#unless previousPage}} disabled{{/unless}} name="page" value="{{ previousPage }}" type="submit">&laquo;</button>
+    <button class="page-previous d-inline-flex btn btn-primary"{{#unlessExists previousPage}} disabled{{/unlessExists}} name="offset" value="{{ previousOffset }}" type="submit">&laquo;</button>
     <p class="page-label my-auto mx-3">{{ pageString }}</p>
-    <button class="page-next d-inline-flex btn btn-primary"{{#unless nextPage}} disabled{{/unless}} name="page" value="{{ nextPage }}" type="submit">&raquo;</button>
+    <button class="page-next d-inline-flex btn btn-primary"{{#unlessExists nextPage}} disabled{{/unlessExists}} name="offset" value="{{ nextOffset }}" type="submit">&raquo;</button>
 </div>

@@ -15,6 +15,14 @@ const Series = new Schema({
         type: String,
         required: true
     },
+    members: {
+        type: Number,
+        required: true
+    },
+    score: {
+        type: Number,
+        required: true
+    },
     season: {
         year: {
             type: Number,

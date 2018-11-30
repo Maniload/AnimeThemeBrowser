@@ -1,11 +1,11 @@
-<a class="series-list-item list-group-item list-group-item-action flex-column align-items-start" href="/series/{{id}}">
-    <img src="{{image}}" class="img-fluid rounded float-left mr-2 img-cover">
-    <div class="d-flex justify-content-between">
-        <h5 class="mb-1">
-            <span class="mr-1">{{title}}</span>
-            <span class="badge badge-secondary text-monospace">{{season.string}}</span>
-        </h5>
-        <small class="text-muted text-uppercase">SERIES</small>
+<a class="series-list-item list-group-item list-group-item-action d-flex flex-row align-items-start" href="/series/{{id}}">
+    <img src="{{image}}" class="img-fluid rounded mr-2 img-cover">
+    <div class="mr-auto">
+        <h5 class="mb-1">{{title}}</h5>
+        <p class="text-muted">{{aliasesString}}</p>
     </div>
-    <p class="text-muted">{{aliasesString}}</p>
+    <div class="d-flex flex-column align-self-stretch justify-content-between text-right text-nowrap">
+        <small class="text-muted text-uppercase">SERIES</small>
+        <small class="text-muted">{{season.string}}</small>
+    </div>
 </a>

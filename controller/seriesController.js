@@ -48,7 +48,7 @@ function fetchList(query, limit, offset, callback) {
     } : {};
 
     async.series({
-        series: function (callback) {
+        series: (callback) => {
             Series
                 .find(queryDocument)
                 .sort("title")
@@ -56,10 +56,9 @@ function fetchList(query, limit, offset, callback) {
                 .skip(offset)
                 .exec(callback);
         },
-        total: function (callback) {
+        total: (callback) => {
             Series
-                .countDocuments(queryDocument)
-                .exec(callback);
+                .countDocuments(queryDocument, callback);
         }
     }, callback);
 }

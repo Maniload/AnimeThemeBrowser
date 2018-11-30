@@ -11,6 +11,20 @@ require("./db").connect(() => {
         helpers: {
             json: function (context) {
                 return JSON.stringify(context);
+            },
+            ifExists: function (value, options) {
+                if (value !== undefined) {
+                    return options.fn(this);
+                }
+
+                return options.inverse(this);
+            },
+            unlessExists: function (value, options) {
+                if (value === undefined) {
+                    return options.fn(this);
+                }
+
+                return options.inverse(this);
             }
         }
     }));
@@ -25,11 +39,11 @@ require("./db").connect(() => {
 
     // Routes
     app.get("/", (req, res) => res.render("home"));
-    // app.get("/search", require("./routes/search"));
+    app.use("/browse", require("./routes/browseRoute"));
     app.use("/", require("./routes/seriesRoute"));
-    app.get("/watch/:id", require("./routes/watchRoute"));
-    // app.get("/mal/:username", require("./routes/mal-import"));
-    // app.get("/playlist", require("./routes/playlist"));
+    app.use("/watch", require("./routes/watchRoute"));
+    app.get("/mal/:username", require("./routes/mal-import"));
+    app.get("/quiz", require("./routes/quizRoute"));
 
     // 404 handler
     app.use(function (req, res) {

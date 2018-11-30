@@ -1,4 +1,7 @@
 <a class="list-group-item text-truncate py-3{{#if active}} active{{else}} list-group-item-action{{/if}}"{{#unless active}} href="/watch/{{id}}"{{/unless}}>
     <span class="badge badge-secondary mr-1">{{typeString}}</span>
-    <span>{{title}}</span>
+    <span class="mr-1">{{title}}</span>
+    {{#if series}}
+        <span class="text-muted">{{series.title}}</span>
+    {{/if}}
 </a>

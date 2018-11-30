@@ -1,5 +1,5 @@
-<h3 class="my-4">Search results{{#if query}} for "{{query}}" {{/if}} ({{total_string}}):</h3>
-<form action="/search">
+<h3 class="my-4">Search results{{#if query}} for "{{query}}" {{/if}} ({{pagination.totalString}}):</h3>
+<form action="">
     <nav>
         <div class="row">
             <div class="form-inline col-12 mb-3">
@@ -9,12 +9,12 @@
                 </div>
                 <input type="submit" id="query-submit" class="btn btn-primary mr-sm-auto" value="Search">
 
-                {{> _pagination}}
+                {{> _pagination pagination}}
             </div>
         </div>
     </nav>
     <div id="theme-list" class="list-group mb-3">
-        <div id="theme-list-no-results" class="list-group-item px-3 py-3 text-center{{#if total_pages}} d-none{{/if}}">
+        <div id="theme-list-no-results" class="list-group-item px-3 py-3 text-center{{#if pagination.total}} d-none{{/if}}">
             <h2>No results!</h2>
         </div>
         {{#each results.series}}
@@ -26,7 +26,7 @@
                         {{> _themeListItemSmall}}
                     {{/each}}
                     {{#if this.themes.missing}}
-                        <small class="text-uppercase mt-2"><a href="/series/{{this.anime_id}}">{{this.themes.missing}} more...</a></small>
+                        <small class="text-uppercase mt-2"><a href="/series/{{this.id}}">{{this.themes.missing}} more...</a></small>
                     {{/if}}
                 </div>
             </div>
@@ -38,7 +38,7 @@
     <nav>
         <div class="row">
             <div class="form-inline col-12 mb-3 justify-content-end">
-                {{> _pagination}}
+                {{> _pagination pagination}}
             </div>
         </div>
 </nav>
