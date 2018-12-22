@@ -1,0 +1,144 @@
+<video id="player" class="d-none"></video>
+<div id="player-container" class="position-relative my-4">
+    <div class="embed-responsive embed-responsive-16by9">
+        <canvas id="canvas" width="1920" height="1080" class="embed-responsive-item"></canvas>
+    </div>
+    <nav id="player-controls" class="nav position-absolute" style="bottom: 0.5rem; right: 0.5rem;">
+        <button class="nav-item pause-button btn btn-primary mr-2" title="Pause">
+            <i class="material-icons inline-icon">pause</i>
+        </button>
+    </nav>
+</div>
+<input id="playlist-title" type="hidden" value="{{playlist.title}}">
+<div class="card my-4">
+    <div id="ranking-entry-header" class="card-header">
+        <div class="d-flex flex-row align-items-start">
+            <h1 id="ranking-entry-rank" class="align-self-center mr-4 mb-0">#1</h1>
+            <div id="theme-select" class="dropdown w-100 align-self-center">
+                <button class="btn btn-success dropdown-toggle w-100" type="button" data-toggle="dropdown">Themes</button>
+                <div class="dropdown-menu w-100" style="max-height: 50vh; overflow-y: scroll;">
+                    {{#each playlist.themes}}{{#with this.theme}}
+                        <a class="dropdown-item" data-id="{{this.id}}">
+                            <h6 class="mb-0">
+                                <span class="badge badge-secondary mr-1">{{this.typeString}}</span>
+                                {{this.title}}
+                            </h6>
+                            <small class="text-muted">{{this.series.title}}</small>
+                        </a>
+                    {{/with}}{{/each}}
+                </div>
+            </div>
+        </div>
+    </div>
+    {{#each playlist.themes}}
+        <div id="ranking-form-{{this.theme.id}}" class="card-body ranking-form collapse" data-info="{{json this}}">
+            <div class="row">
+                <div class="col-2">
+                    <a href="https://myanimelist.net/anime/{{this.theme.series.id}}" target="_blank">
+                        <img src="{{this.theme.series.image}}" class="img-fluid my-4">
+                    </a>
+                </div>
+                <div class="col-10">
+                    <form>
+                        <div class="form-row">
+                            <div class="form-group col-12 col-md-6">
+                                <label for="series-input">Series Title</label>
+                                <div class="input-group">
+                                    <input type="text" id="series-input" class="series-input form-control" name="seriesTitle" value="{{#if this.mappings.seriesTitle}}{{this.mappings.seriesTitle}}{{else}}{{this.theme.series.title}}{{/if}}">
+                                    {{#if this.theme.series.aliases}}
+                                        <div class="alias-select input-group-append">
+                                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Aliases</button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item">{{this.theme.series.title}}</a>
+                                                <div role="separator" class="dropdown-divider"></div>
+                                                {{#each this.theme.series.aliases}}
+                                                    <a class="dropdown-item">{{this}}</a>
+                                                {{/each}}
+                                            </div>
+                                        </div>
+                                    {{/if}}
+                                </div>
+                                <small class="form-text text-muted mapping-info">
+                                    {{#if this.mappings.seriesTitle}}Custom mapping{{/if}}
+                                </small>
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="series-info-input">Series Info</label>
+                                <input type="text" id="series-info-input" class="series-info-input form-control" name="seriesInfo" value="{{#if this.mappings.seriesInfo}}{{this.mappings.seriesInfo}}{{else}}{{this.theme.series.season.string}}{{/if}}">
+                                <small class="form-text text-muted mapping-info">
+                                    {{#if this.mappings.seriesInfo}}Custom mapping{{/if}}
+                                </small>
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="theme-input">Theme Title</label>
+                                <input type="text" id="theme-input" class="theme-input form-control" name="themeTitle" value="{{#if this.mappings.themeTitle}}{{this.mappings.themeTitle}}{{else}}{{this.theme.title}}{{/if}}">
+                                <small class="form-text text-muted mapping-info">
+                                    {{#if this.mappings.themeTitle}}Custom mapping{{/if}}
+                                </small>
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="theme-info-input">Theme Info</label>
+                                <input type="text" id="theme-info-input" class="theme-info-input form-control" name="themeInfo" value="{{#if this.mappings.themeInfo}}{{this.mappings.themeInfo}}{{else}}{{this.theme.typeString}}{{/if}}">
+                                <small class="form-text text-muted mapping-info">
+                                    {{#if this.mappings.themeInfo}}Custom mapping{{/if}}
+                                </small>
+                            </div>
+                            <div class="form-group col-12 col-md-3">
+                                <label for="rank-info-input">Rank Info</label>
+                                <input type="text" id="rank-info-input" class="rank-info-input form-control" name="rankInfo" value="{{this.mappings.rankInfo}}">
+                                <small class="form-text text-muted mapping-info">
+                                    Custom mapping
+                                </small>
+                            </div>
+                            <div class="form-group col-12 col-md-3">
+                                <label for="version-select">Version</label>
+                                <select id="version-select" class="version-select custom-select">
+                                    {{#each this.theme.versions}}
+                                        {{#each this.sources}}
+                                            <option
+                                                {{#ifEquals ../../mappings.version ../index}}{{#ifEquals ../../mappings.source index}}selected{{/ifEquals}}{{/ifEquals}}
+                                                label="{{../string}}{{#if this.tags}} ({{#each this.tags}}{{this.string}}{{#unless @last}}, {{/unless}}{{/each}}){{/if}}"
+                                                value="{{this.url}}">
+                                            </option>
+                                        {{/each}}
+                                    {{/each}}
+                                </select>
+                                <small class="form-text text-muted mapping-info">
+                                    Custom mapping
+                                </small>
+                            </div>
+                            <div class="form-group col-6 col-md-3">
+                                <label for="save-mappings-button">Save Mappings</label>
+                                <button id="save-mappings-button" class="btn btn-primary form-control save-mappings-button" type="button">Save Mappings</button>
+                            </div>
+                            <div class="form-group col-6 col-md-3">
+                                <label for="render-button">Preview</label>
+                                <button id="render-button" class="btn btn-primary form-control render-button" type="button">Preview</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {{/each}}
+</div>
+
+<div id="rank-select">
+    {{#each pages}}
+        <nav class="mb-4">
+            <ul class="pagination">
+                {{#each this}}
+                    <li class="page-item" style="width: 5%;"><a class="page-link text-center bg-secondary" data-rank="{{this.rank}}">#{{this.rank}}</a></li>
+                {{/each}}
+            </ul>
+        </nav>
+    {{/each}}
+</div>
+
+<form class="form-inline mb-4">
+    <label class="sr-only" for="ranking-name">Ranking Name</label>
+    <input id="ranking-title" class="form-control mr-2" placeholder="Ranking Title">
+    <button id="save-button" type="button" class="btn btn-success">Save Ranking</button>
+</form>
+
+<script defer src="/js/render.js"></script>

@@ -7,4 +7,7 @@ $(window).resize(function () {
         "padding-bottom": footer.outerHeight() + "px"
     });
 
+    // Enable bootstrap tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
 }).resize();

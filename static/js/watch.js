@@ -26,40 +26,38 @@ $(document).ready(function () {
         let themeId = Number($(this).attr("data"));
 
         $.post({
-            url: "/api/playlist",
-            data: JSON.stringify({
-                theme_id: themeId
-            }),
+            url: "/api/playlist/test-playlist",
+            data: JSON.stringify([ themeId ]),
             contentType: "application/json",
             success: function (theme) {
-                let playlist = $("#playlist");
-                if (!playlist.length) {
-                    $("#related-content").append(
-                        $("<h4>", {
-                            html: "Playlist:",
-                            "class": "mt-2"
-                        }),
-                        playlist = $("<div>", {
-                            id: "playlist",
-                            "class": "list-group"
-                        })
-                    );
-                }
-
-                playlist.append(
-                    $("<a>", {
-                        "class": "list-group-item active"
-                    }).append(
-                        $("<div>", {
-                            html: theme.theme_title,
-                            "class": "text-truncate mr-1"
-                        }),
-                        $("<div>", {
-                            html: theme.anime_title,
-                            "class": "text.truncate text-muted"
-                        })
-                    )
-                );
+                // let playlist = $("#playlist");
+                // if (!playlist.length) {
+                //     $("#related-content").append(
+                //         $("<h4>", {
+                //             html: "Playlist:",
+                //             "class": "mt-2"
+                //         }),
+                //         playlist = $("<div>", {
+                //             id: "playlist",
+                //             "class": "list-group"
+                //         })
+                //     );
+                // }
+                //
+                // playlist.append(
+                //     $("<a>", {
+                //         "class": "list-group-item active"
+                //     }).append(
+                //         $("<div>", {
+                //             html: theme.theme_title,
+                //             "class": "text-truncate mr-1"
+                //         }),
+                //         $("<div>", {
+                //             html: theme.anime_title,
+                //             "class": "text.truncate text-muted"
+                //         })
+                //     )
+                // );
 
                 playlistAdd.popover({
                     title: "Success!",

@@ -24,7 +24,7 @@
         <div class="container">
             <a class="navbar-brand" href="/">
                 <img src="/img/icon.svg" width="30" height="30" class="d-inline-block align-top mr-2">
-                Anime Theme Browser
+                <span style="font-family: Renogare, serif;">AniThemes</span>
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,18 +46,18 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/playlist">
+                        <a class="nav-link" href="/playlists">
                             <i class="material-icons inline-icon mr-1">playlist_play</i>
                             <span>Playlist</span>
                         </a>
                     </li>
                 </ul>
 
-                <form class="form-inline my-2 my-lg-0 dropdown">
-                    <input id="quick-searchController" class="form-control mr-sm-2 dropdown-toggle" data-toggle="dropdown" type="searchController" placeholder="Quick Search" aria-label="Search">
-                    <div id="quick-searchController-results" class="dropdown-menu">
-                        <h6 id="quick-searchController-placeholder" class="dropdown-header">Search results will show up here</h6>
-                        <h6 id="quick-searchController-no-results" class="dropdown-header" style="display: none;">Nothing found</h6>
+                <form class="form-inline my-2 my-lg-0 dropdown" autocomplete="off" action="browse">
+                    <input id="quick-search" class="form-control dropdown-toggle" data-toggle="dropdown" type="search" placeholder="Quick Search" name="query">
+                    <div id="quick-search-results" class="dropdown-menu dropdown-menu-right" style="max-width: 500px;">
+                        <h6 id="quick-search-placeholder" class="dropdown-header">Search results will show up here</h6>
+                        <h6 id="quick-search-no-results" class="dropdown-header" style="display: none;">Nothing found</h6>
                     </div>
                 </form>
             </div>
@@ -86,6 +86,6 @@
     <script src="/js/bootstrap.min.js"></script>
 
     <script src="/js/base.js"></script>
-    <script src="/js/quick-searchController.js"></script>
+    <script src="/js/quick-search.js"></script>
 </body>
 </html>

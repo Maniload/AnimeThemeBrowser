@@ -133,6 +133,8 @@ These are __non__-valid anime alias entries:
 
 Type: String
 
+---
+
 ### <a name="type.artist"></a>Artist
 
 An artist of theme songs. These are stored seperatly to allow for filtering by an explicit artist.

@@ -1,8 +1,22 @@
-<div class="card my-4">
-    <img class="card-img-top" src="/img/coming-soon.png">
-    <div class="card-body">
-        <div class="card-text">
-            This is the start of a new extensive, fast and feature rich database for anime themes.
-        </div>
-    </div>
+<div class="jumbotron my-4">
+    <h1 class="display-4 align-middle">
+        <img src="/img/icon.svg" width="75" height="75" class="d-inline-block align-top mr-2">
+        <span>AniThemes</span>
+    </h1>
+    <hr class="my-4">
+    <p class="lead">This is the start of a new extensive, fast and feature rich database for anime themes.</p>
 </div>
+
+<h3>Listen to themes from...</h3>
+
+<div class="row my-4">
+    {{#each series}}
+        <div class="col-lg-2 col-md-4 col-6 mb-4 mb-lg-0" data-toggle="tooltip" data-placement="bottom" title="{{this.title}}">
+            <a href="/series/{{this.id}}" class="m-auto img-home-container">
+                <img src="{{this.image}}" class="img-fluid d-block rounded img-home">
+            </a>
+        </div>
+    {{/each}}
+</div>
+
+<h3 class="text-right">...and <a href="/browse">many more!</a></h3>

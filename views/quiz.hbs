@@ -1,8 +1,27 @@
-<div class="embed-responsive embed-responsive-16by9 my-4">
-    <video id="player" controls autoplay class="embed-responsive-item"></video>
-    <canvas id="canvas" width="1920" height="1080" class="position-absolute w-100"></canvas>
+<video id="player" class="d-none"></video>
+<video id="player-preload" class="d-none"></video>
+<div id="player-container" class="position-relative my-4">
+    <div class="embed-responsive embed-responsive-16by9">
+        <canvas id="canvas" width="1920" height="1080" class="embed-responsive-item"></canvas>
+    </div>
+    <nav id="player-controls" class="nav position-absolute" style="bottom: 0.5rem; right: 0.5rem;">
+        <button class="nav-item pause-button btn btn-primary mr-2" title="Pause">
+            <i class="material-icons inline-icon">pause</i>
+        </button>
+        <button class="nav-item next-button btn btn-primary mr-2" title="Next">
+            <i class="material-icons inline-icon">skip_next</i>
+        </button>
+        <button class="nav-item fullscreen-button btn btn-primary" title="Fullscreen">
+            <i class="material-icons inline-icon">fullscreen</i>
+        </button>
+    </nav>
 </div>
-<button class="next-button btn btn-primary">Next</button>
+<div class="form-inline">
+    <div class="form-group">
+        <label class="mr-2" for="guess-time-input">Guess Time</label>
+        <input id="guess-time-input" class="form-control" type="number" value="10" min="1" max="60">
+    </div>
+</div>
 <script>
     const themes = {{{json themes}}};
 </script>

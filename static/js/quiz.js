@@ -2,40 +2,72 @@ document.addEventListener('DOMContentLoaded', function () {
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
 
-    let task;
+    let currentTheme;
+    let nextTheme;
 
     $(".next-button").click(function () {
-        let theme = themes.splice(Math.random() * themes.length, 1)[0];
-
         let player = $("#player");
-        player.attr("src", getPreferredSource(theme.versions[0].sources).url);
+        let preloader = $("#player-preload");
 
-        clearInterval(task);
-        let frame = 0;
-        task = setInterval(function () {
-            render(frame, theme);
+        if (nextTheme) {
+            currentTheme = nextTheme;
 
-            if (!$("#player").get(0).paused) {
-                frame++;
-            }
+            player.attr("src", preloader.attr("src"));
+        } else {
+            currentTheme = getRandomTheme();
 
-            if (frame >= 24 * 20) {
-                clearInterval(task);
-            }
-        }, 1000 / 24);
+            player.attr("src", getPreferredSource(currentTheme.versions[0].sources).url);
+            player.get(0).load();
+        }
+
+        player.on("canplay", () => player.get(0).play());
+
+        nextTheme = getRandomTheme();
+
+        preloader.attr("src", getPreferredSource(nextTheme.versions[0].sources).url);
+        preloader.get(0).load();
     });
 
-    function render(frame, theme) {
-        // 10 second guessing time
-        frame -= 24 * 10;
+    $(".pause-button").click(function () {
+        let domPlayer = $("#player").get(0);
+
+        if (domPlayer.paused) {
+            domPlayer.play();
+        } else {
+            domPlayer.pause();
+        }
+    });
+
+    $(".fullscreen-button").click(() => toggleFullscreen($("#player-container").get(0)));
+
+    $("#canvas").click(() => $("#player-controls").toggle());
+
+    requestAnimationFrame(render);
+
+    function render() {
+        let domPlayer = $("#player").get(0);
+
+        if (!domPlayer.paused && currentTheme) {
+            ctx.drawImage(domPlayer, 0, 0, canvas.width, canvas.height);
+
+            renderOverlay(Math.floor(domPlayer.currentTime * 24), currentTheme);
+        }
+
+        requestAnimationFrame(render);
+    }
+
+    function renderOverlay (frame, theme) {
+        let guessTime = $("#guess-time-input").val();
+
+        frame -= 24 * guessTime;
 
         if (frame < 0) {
             ctx.font = "100px Renogare";
             let counter = Math.floor(Math.abs(frame) / 24).toString();
-            let counterBox = Object.assign(ctx.measureText(counter), { height: getTextHeight(ctx, counter) });
-            let angle = (Math.abs(frame) / (24 * 10)) * (2 * Math.PI);
+            let counterBox = Object.assign(ctx.measureText(counter), { height: getTextHeight(ctx, 100, counter) });
+            let angle = (Math.abs(frame) / (24 * guessTime)) * (2 * Math.PI);
 
-            ctx.fillStyle = "#000000";
+            ctx.fillStyle = "#37474F";
             ctx.fillRect(0, 0, 1920, 1080);
 
             ctx.fillStyle = "#FFFFFF";
@@ -49,8 +81,6 @@ document.addEventListener('DOMContentLoaded', function () {
             ctx.fillText(counter, 1920 / 2 - counterBox.width / 2, 1080 / 2 + counterBox.height / 2);
             return;
         }
-
-        ctx.clearRect(0, 0, 1920, 1080);
 
         let x = [ 0, 0, 0, 0, 0, 0 ];
         for (let i = 0; i < x.length; i++) {
@@ -80,26 +110,37 @@ document.addEventListener('DOMContentLoaded', function () {
 
         ctx.fillStyle = shapeFillStyle;
         ctx.beginPath();
-        ctx.moveTo(x, y);
+        ctx.moveTo(x - 10, y);
         ctx.lineTo(x + rectWidth, y);
         ctx.arc(x + rectWidth, y + height / 2, height / 2, Math.PI / 2 * 3, Math.PI / 2);
-        ctx.lineTo(x, y + height);
+        ctx.lineTo(x - 10, y + height);
         ctx.closePath();
         ctx.fill();
 
         ctx.shadowColor = "transparent";
 
         ctx.fillStyle = textFillStyle;
-        ctx.fillText(text, x + paddingX, y + height / 2 + getTextHeight(ctx) / 2);
+        ctx.fillText(text, x + paddingX, y + height / 2 + getTextHeight(ctx, (height - paddingY * 2)) / 2);
     }
 
-    function getTextHeight(ctx, text = "T") {
+    function getTextHeight(ctx, fallback, text = "T") {
         let dummyTextBox = ctx.measureText(text);
-        return dummyTextBox.actualBoundingBoxAscent + dummyTextBox.actualBoundingBoxDescent;
+
+        // This is still a very experimantel API feature, but it gives great results
+        if (dummyTextBox.actualBoundingBoxAscent !== undefined && dummyTextBox.actualBoundingBoxDescent !== undefined) {
+            return dummyTextBox.actualBoundingBoxAscent + dummyTextBox.actualBoundingBoxDescent;
+        }
+
+        // Fallback should be the same as font size
+        return fallback;
     }
 
     function bezierEaseOut(x) {
         return 3 * (0.9) * Math.pow(1 - x, 2) * x + 3 * (1 - x) * Math.pow(x, 2) + (1) * Math.pow(x, 3);
+    }
+
+    function getRandomTheme() {
+        return themes.splice(Math.random() * themes.length, 1)[0];
     }
 
     // TODO: Make the user decide which tags he prefers (and save that in cookies or something)
@@ -115,6 +156,35 @@ document.addEventListener('DOMContentLoaded', function () {
             preferredTags.filter((tag) => a.tags.find((testTag) => testTag.id === tag)).length
         );
         return sources[0];
+    }
+    
+    function toggleFullscreen(element) {
+        let isInFullScreen = (document.fullscreenElement && document.fullscreenElement !== null) ||
+            (document.webkitFullscreenElement && document.webkitFullscreenElement !== null) ||
+            (document.mozFullScreenElement && document.mozFullScreenElement !== null) ||
+            (document.msFullscreenElement && document.msFullscreenElement !== null);
+
+        if (!isInFullScreen) {
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen();
+            } else if (element.webkitRequestFullScreen) {
+                element.webkitRequestFullScreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
     }
 
 });

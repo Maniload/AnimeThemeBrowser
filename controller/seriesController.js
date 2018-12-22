@@ -102,3 +102,20 @@ function fetchDetail(id, callback) {
         }
     ], callback);
 }
+
+exports.top = function (req, res) {
+    Series
+        .find()
+        .sort("-members")
+        .limit(6)
+        .exec((err, series) => {
+            if (err) {
+                res.sendStatus(500);
+                return;
+            }
+
+            res.render("home", {
+                series: series
+            })
+        });
+};

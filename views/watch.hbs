@@ -18,8 +18,8 @@
         </div>
         <div class="col-auto my-auto order-last order-md-0 text-right">
             <a tabindex="0" id="playlist-add" href data="{{ theme.id }}">
-                <i class="material-icons">
-                    playlist_add
+                <i class="material-icons{{#unless inPlaylist}} text-white{{/unless}}">
+                    {{#if inPlaylist}}playlist_add_check{{else}}playlist_add{{/if}}
                 </i>
             </a>
         </div>

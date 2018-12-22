@@ -4,11 +4,54 @@ const pagination = require("../util/pagination");
 const Series = require("../models/series");
 const Theme = require("../models/theme");
 
-exports.browse = function(req, res) {
-    let query = req.query.query,
-        limit = Math.min(Math.max(1, +(req.query.limit || 30))),
-        offset = Math.max(+(req.query.offset || 0));
+exports.browse = {
+    render: function(req, res) {
+        let query = req.query.query,
+            limit = Math.min(Math.max(1, +(req.query.limit || 30))),
+            offset = Math.max(+(req.query.offset || 0));
 
+        search(query, limit, offset, (err, results) => {
+            if (err) {
+                console.error(err);
+                res.sendStatus(500);
+                return;
+            }
+
+            res.render("browse", {
+                results: {
+                    series: results.series,
+                    themes: results.themes
+                },
+                pagination: pagination(limit, offset, results.total),
+                query: query,
+                pageTitle: "Browse"
+            });
+        });
+    },
+    api: function (req, res) {
+        let query = req.query.query,
+            limit = Math.min(Math.max(1, +(req.query.limit || 30))),
+            offset = Math.max(+(req.query.offset || 0));
+
+        search(query, limit, offset, (err, results) => {
+            if (err) {
+                console.error(err);
+                res.status(400).send(err);
+                return;
+            }
+
+            res.json({
+                results: {
+                    series: results.series,
+                    themes: results.themes
+                },
+                pagination: pagination(limit, offset, results.total)
+            });
+        });
+    }
+};
+
+function search(query, limit, offset, callback) {
     let queryDocument = query ? {
         $or: [
             {
@@ -26,22 +69,10 @@ exports.browse = function(req, res) {
         ]
     } : {};
 
-    let time = Date.now();
-
     async.waterfall([
         searchSeries,
         searchThemes
-    ], (err, results) => {
-        if (err) {
-            console.error(err);
-            res.sendStatus(500);
-            return;
-        }
-
-        console.log("Took " + (Date.now() - time));
-
-        res.render("browse", results);
-    });
+    ], callback);
 
     function searchSeries(callback) {
         async.parallel({
@@ -64,7 +95,7 @@ exports.browse = function(req, res) {
                                             series: series.id
                                         })
                                         .limit(2)
-                                        .sort("type index")
+                                        .sort("index type")
                                         .exec(callback);
                                 },
                                 total: (callback) => {
@@ -87,106 +118,31 @@ exports.browse = function(req, res) {
         }, callback);
     }
 
-    function searchThemes(foundSeries, callback) {
-        let foundThemes = [];
-
-        if (foundSeries.series.length < 30) {
-
-        }
-
-        callback(null, {
-            results: {
-                series: foundSeries.series,
-                themes: foundThemes
-            },
-            pagination: pagination(limit, offset, foundSeries.total),
-            query: query,
-            pageTitle: "Browse"
-        });
+    function searchThemes(seriesResults, callback) {
+        async.waterfall([
+            (callback) => async.parallel({
+                themes: (callback) => {
+                    if (seriesResults.series.length < limit) {
+                        Theme
+                            .find(queryDocument)
+                            .limit(limit - seriesResults.series.length)
+                            .skip(offset - seriesResults.total + seriesResults.series.length)
+                            .sort("title")
+                            .populate("series")
+                            .exec(callback);
+                    } else {
+                        callback(null, []);
+                    }
+                },
+                total: (callback) => {
+                    Theme.countDocuments(queryDocument, callback);
+                }
+            }, callback),
+            (themeResults, callback) => callback(null, {
+                series: seriesResults.series,
+                themes: themeResults.themes,
+                total: seriesResults.total + themeResults.total
+            })
+        ], callback);
     }
-
-    // if (mode === modes.MIXED || mode === modes.SERIES) {
-    //     // Search series first, to order them above themes
-    //     sql =
-    //         "SELECT anime.* FROM anime " +
-    //         "LEFT JOIN anime_alias USING (anime_id)";
-    //     if (query) {
-    //         sql += " WHERE anime_title LIKE ? OR alias LIKE ?";
-    //     }
-    //     sql += " GROUP BY anime_id ORDER BY anime_title " + order + " LIMIT ? OFFSET ?;";
-    //
-    //     let seriesList = await (query ? all(sql, query, query, limit, offset) : all(sql, limit, offset));
-    //
-    //     for (let series of seriesList) {
-    //         // Include theme sample
-    //         sql =
-    //             "SELECT theme.* FROM theme " +
-    //             "INNER JOIN anime USING (anime_id) " +
-    //             "WHERE anime_id = ? ORDER BY theme_index, type LIMIT 2;";
-    //
-    //         let totalSql =
-    //             "SELECT COUNT(*) AS total FROM theme " +
-    //             "INNER JOIN anime USING (anime_id) " +
-    //             "WHERE anime_id = ?;";
-    //
-    //         series.themes = {
-    //             sample: await all(sql, series.anime_id),
-    //             total: (await get(totalSql, series.anime_id)).total
-    //         };
-    //         series.themes.missing = Math.max(series.themes.total - 2, 0);
-    //
-    //         for (let themeSample of series.themes.sample) {
-    //             await fetchTheme(themeSample);
-    //         }
-    //
-    //         await fetchSeries(series);
-    //     }
-    //
-    //     results.series = seriesList;
-    // }
-    // if ((mode === modes.MIXED || mode === modes.THEMES) && results.series.length < limit) {
-    //     let sql =
-    //         "SELECT * FROM theme " +
-    //         "INNER JOIN anime USING (anime_id)";
-    //     if (query) {
-    //         sql += " WHERE theme_title LIKE ?";
-    //     }
-    //     sql += " ORDER BY theme_title " + order + " LIMIT ? OFFSET ?;";
-    //
-    //     let themeList = await (query ?
-    //         all(sql, query, limit - results.series.length, offset) :
-    //         all(sql, limit - results.series.length, offset)
-    //     );
-    //
-    //     for (let theme of themeList) {
-    //         await fetchTheme(theme);
-    //     }
-    //
-    //     results.themes = themeList;
-    // }
-    //
-    // // Get total search results
-    // sql = "SELECT COUNT(*) AS total FROM theme";
-    // if (query) {
-    //     sql += " WHERE theme_title LIKE ?";
-    // }
-    // sql += ";";
-    //
-    // let total = (await (query ? get(sql, query) : get(sql))).total;
-    //
-    // sql =
-    //     "SELECT COUNT(*) AS total FROM (" +
-    //     "SELECT anime_id FROM anime " +
-    //     "LEFT JOIN anime_alias USING (anime_id)";
-    // if (query) {
-    //     sql += " WHERE anime_title LIKE ? OR alias LIKE ?";
-    // }
-    // sql += " GROUP BY anime_id);";
-    //
-    // total += (await (query ? get(sql, query, query) : get(sql))).total;
-    //
-    // return {
-    //     total: total,
-    //     results: results
-    // };
-};
+}

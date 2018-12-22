@@ -11,7 +11,8 @@ const Tag = new Schema({
     _id: false,
     toObject: {
         virtuals: true
-    }
+    },
+    toJSON: require("../util/api").toJSON
 });
 
 Tag
@@ -37,9 +38,11 @@ const Version = new Schema({
     ]
 }, {
     _id: false,
+    id: false,
     toObject: {
         virtuals: true
-    }
+    },
+    toJSON: require("../util/api").toJSON
 });
 
 Version

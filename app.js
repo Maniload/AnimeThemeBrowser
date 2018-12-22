@@ -25,6 +25,12 @@ require("./db").connect(() => {
                 }
 
                 return options.inverse(this);
+            },
+            ifEquals: function (a, b, options) {
+                if (a === b) {
+                    return options.fn(this);
+                }
+                return options.inverse(this);
             }
         }
     }));
@@ -38,16 +44,17 @@ require("./db").connect(() => {
     app.use(require("body-parser").json());
 
     // Routes
-    app.get("/", (req, res) => res.render("home"));
-    app.use("/browse", require("./routes/browseRoute"));
+    app.get("/", require("./controller/seriesController").top);
+    app.use("/", require("./routes/browseRoute"));
     app.use("/", require("./routes/seriesRoute"));
     app.use("/watch", require("./routes/watchRoute"));
+    app.use("/", require("./routes/playlistRoute"));
     app.get("/mal/:username", require("./routes/mal-import"));
     app.get("/quiz", require("./routes/quizRoute"));
 
     // 404 handler
     app.use(function (req, res) {
-        res.render("error", {
+        res.status(404).render("error", {
             code: 404,
             message: "Page not found.",
             pageTitle: "404"

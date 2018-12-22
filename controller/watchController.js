@@ -1,6 +1,7 @@
 const async = require("async");
 
 const Theme = require("../models/theme");
+const Playlist = require("../models/playlist");
 
 exports.watch = function (req, res, next) {
     let themeId = Number(req.params.id);
@@ -12,9 +13,12 @@ exports.watch = function (req, res, next) {
             Theme.findById(themeId).populate("series").exec(callback);
         },
         function (theme, callback) {
-            Theme.find({ series: theme.series }).sort("type index").exec((err, themes) => callback(err, theme, themes));
+            Playlist.findById("test-playlist").exec((err, playlist) => callback(err, theme, playlist && playlist.themes.includes(+theme.id)));
+        },
+        function (theme, inPlaylist, callback) {
+            Theme.find({ series: theme.series }).sort("type index").exec((err, themes) => callback(err, theme, inPlaylist, themes));
         }
-    ], (err, theme, themes) => {
+    ], (err, theme, inPlaylist, themes) => {
 
         if (err) {
             // Redirect to 404
@@ -43,7 +47,8 @@ exports.watch = function (req, res, next) {
             themes: themes,
             version: version,
             source: source,
-            pageTitle: theme.title
+            pageTitle: theme.title,
+            inPlaylist: inPlaylist
         });
 
     });
