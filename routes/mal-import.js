@@ -8,23 +8,33 @@ const Theme = require("../models/theme");
 module.exports = function (req, res) {
     let username = req.params.username;
 
-    request("https://myanimelist.net/animelist/" + username, (err, _, body) => {
+    console.log("Fetching MAL list for: " + username);
+
+    let offset = 0;
+    let animeIds = [];
+
+    async.doWhilst((callback) => {
+        request("https://myanimelist.net/animelist/" + username + "/load.json?status=2&offset=" + offset, (err, _, body) => {
+            if (err) {
+                callback(err);
+                return;
+            }
+
+            let animeList = JSON.parse(body);
+
+            offset += animeList.length;
+
+            for (let anime of animeList) {
+                animeIds.push(anime.anime_id);
+            }
+
+            callback(null, animeList);
+        });
+    }, (animeList) => animeList.length, (err) => {
         if (err) {
             console.error(err);
             res.sendStatus(500);
             return;
-        }
-
-        let $ = require("jquery")(new jsdom.JSDOM(body).window);
-
-        let animeList = JSON.parse($("table").eq(0).attr("data-items"));
-        let animeIds = [];
-
-        // Only include completed (status = 2) animes
-        for (let anime of animeList) {
-            if (anime.status === 2) {
-                animeIds.push(anime.anime_id);
-            }
         }
 
         async.concat(animeIds, (animeId, callback) => {
