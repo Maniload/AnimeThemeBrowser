@@ -37,7 +37,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     $(document).on("click", ".alias-select .dropdown-item", function () {
-        $(this).closest(".ranking-form").find(".series-input").val($(this).text());
+        let seriesInput = $(this).closest(".ranking-form").find(".series-input");
+        seriesInput.val($(this).text());
+
+        onChange.call(seriesInput);
     });
 
     $("#theme-select .dropdown-item").click(function () {
@@ -52,13 +55,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let rankButton = $(".page-link[data-rank='" + currentRank + "']");
 
-        rankButton.attr("data-theme", currentTheme.theme.id).removeClass("bg-secondary");
+        rankButton.attr("theme", currentTheme.theme.id).removeClass("bg-secondary");
     });
 
     $("#rank-select").on("click", ".page-link", function () {
         let rankButton = $(this);
         currentRank = rankButton.data("rank");
-        currentTheme = $("#ranking-form-" + rankButton.data("theme")).data("info");
+        currentTheme = $("#ranking-form-" + rankButton.attr("theme")).data("info");
 
         $(".ranking-form.active").removeClass("active").collapse("hide");
 
@@ -71,14 +74,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    $(document).on("input", "input, select", function () {
+    $(document).on("input", "input, select", onChange);
+
+    function onChange() {
         let input = $(this);
         input.closest(".form-group").find(".mapping-info").text("Unsaved mapping change!");
 
         if (!input.hasClass("changed")) {
             input.addClass("changed");
         }
-    });
+    }
 
     $(document).on("click", ".save-mappings-button", function () {
         let update = {};
@@ -86,6 +91,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         for (let input of form.find("input.changed")) {
             update[$(input).attr("name")] = $(input).val();
+        }
+
+        if (form.find(".version-select.changed").length) {
+            let option = form.find(".version-select option:checked");
+            update.version = option.data("version");
+            update.source = option.data("source");
         }
 
         if (Object.keys(update)) {
@@ -97,8 +108,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     contentType: "application/json; charset=utf-8",
                     method: "POST",
                     success: function () {
-                        for (let input of form.find("input.changed")) {
-                            $(input).removeClass("changed").next(".mapping-info").text("Custom mapping");
+                        for (let input of form.find("input.changed, select.changed")) {
+                            $(input).removeClass("changed").closest(".form-group").find(".mapping-info").text("Custom mapping");
                         }
                     }
                 }
@@ -118,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         for (let rankButton of $(".page-link")) {
             let rank = $(rankButton).data("rank");
-            let themeId = $(rankButton).data("theme");
+            let themeId = $(rankButton).attr("theme");
 
             if (themeId) {
                 ranking.ranks.push({

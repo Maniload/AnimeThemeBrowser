@@ -96,9 +96,9 @@
                                     {{#each this.theme.versions}}
                                         {{#each this.sources}}
                                             <option
-                                                {{#ifEquals ../../mappings.version ../index}}{{#ifEquals ../../mappings.source index}}selected{{/ifEquals}}{{/ifEquals}}
+                                                {{#ifEquals ../../mappings.version ../index}}{{#ifEquals ../../mappings.source @index}}selected{{/ifEquals}}{{/ifEquals}}
                                                 label="{{../string}}{{#if this.tags}} ({{#each this.tags}}{{this.string}}{{#unless @last}}, {{/unless}}{{/each}}){{/if}}"
-                                                value="{{this.url}}">
+                                                value="{{this.url}}" data-version="{{../index}}" data-source="{{@index}}">
                                             </option>
                                         {{/each}}
                                     {{/each}}

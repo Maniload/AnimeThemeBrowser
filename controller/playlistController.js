@@ -34,11 +34,18 @@ exports.list = {
                 });
         },
         post: function (req, res) {
+            req.body.themes = req.body.themes.map((themeId) => ({ theme: themeId }));
+
             let playlist = new Playlist(req.body);
 
             async.waterfall([
                 (callback) => playlist.save(callback),
-                (playlist, callback) => playlist.populate("themes", callback)
+                (playlist, callback) => playlist.populate({
+                    path: "themes.theme",
+                    populate: {
+                        path: "series"
+                    }
+                }, callback)
             ], (err, playlist) => {
                 if (err) {
                     res.status(400).send(err);
