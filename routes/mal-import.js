@@ -5,7 +5,7 @@ const request = require("request");
 const Series = require("../models/series");
 const Theme = require("../models/theme");
 
-module.exports = function (req, res) {
+module.exports = function (req, res, next) {
     let username = req.params.username;
 
     console.log("Fetching MAL list for: " + username);
@@ -16,11 +16,16 @@ module.exports = function (req, res) {
     async.doWhilst((callback) => {
         request("https://myanimelist.net/animelist/" + username + "/load.json?status=2&offset=" + offset, (err, _, body) => {
             if (err) {
-                callback(err);
+                callback(404);
                 return;
             }
 
             let animeList = JSON.parse(body);
+
+            if (!animeList || !(animeList instanceof Array)) {
+                callback(404);
+                return;
+            }
 
             offset += animeList.length;
 
@@ -33,7 +38,13 @@ module.exports = function (req, res) {
     }, (animeList) => animeList.length, (err) => {
         if (err) {
             console.error(err);
-            res.sendStatus(500);
+
+            if (err === 404) {
+                next();
+            } else {
+                res.sendStatus(500);
+            }
+
             return;
         }
 

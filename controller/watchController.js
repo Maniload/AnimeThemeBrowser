@@ -13,6 +13,11 @@ exports.watch = function (req, res, next) {
             Theme.findById(themeId).populate("series").exec(callback);
         },
         function (theme, callback) {
+            if (!theme) {
+                callback(404);
+                return;
+            }
+
             Playlist.findById("test-playlist").exec((err, playlist) => callback(err, theme, playlist && playlist.themes.includes(+theme.id)));
         },
         function (theme, inPlaylist, callback) {
@@ -34,12 +39,22 @@ exports.watch = function (req, res, next) {
         });
 
         let version = theme.versions.find((version) => version.index === versionId);
+        if (!version) {
+            // Redirect to 404
+            next();
+            return;
+        }
 
         if (sourceId < 0) {
             sourceId = version.sources.indexOf(getPreferredSource(req, version.sources));
         }
 
         let source = version.sources[sourceId];
+        if (!source) {
+            // Redirect to 404
+            next();
+            return;
+        }
         source.active = true;
 
         res.render("watch", {

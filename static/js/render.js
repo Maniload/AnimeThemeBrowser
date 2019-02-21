@@ -153,6 +153,8 @@ document.addEventListener('DOMContentLoaded', function () {
         );
     });
 
+    initDiagram(ctx);
+
     // Preview rendering
 
     const frameRate = 60;
@@ -174,17 +176,21 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderOverlay(frame, entry) {
         let x = [0, 0, 0, 0, 0, 0];
         for (let i = 0; i < x.length; i++) {
-            if (frame - i * 4 < frameRate) {
-                x[i] = bezierEaseOut((frame - i * 4) / frameRate) * 1920 - 1920;
-            } else if (frame + i * 4 > frameRate * 10 - 4) {
-                x[i] = bezierEaseOut((frameRate * 10 - (frame + i * 4)) / frameRate) * 1920 - 1920;
+            if (frame - i * 8 < frameRate) {
+                x[i] = bezier((frame - i * 8) / frameRate, 1, 1) * 1920 - 1920;
+            } else if (frame + i * 8 > frameRate * 11) {
+                x[i] = -1920;
+            } else if (frame + i * 8 > frameRate * 10) {
+                x[i] = bezier(((frame + i * 8) - frameRate * 10) / frameRate, 0, 0) * -1920;
             }
         }
 
         // Draw shapes and text
-        if (entry.rankInfo) {
-            drawPillar(entry.rankInfo, "#37474F", x[1], 54 + 270, 60, "#FFFFFF", 32, 12);
-        }
+        // if (entry.rankInfo) {
+        //     drawPillar(entry.rankInfo, "#37474F", x[1], 54 + 270, 60, "#FFFFFF", 32, 12);
+        // }
+
+        renderDiagram(Math.max(0, Math.min(frame, 9 * frameRate)) - frameRate, ctx, x[1]);
 
         drawPillar(entry.rank, "#FFFFFF", x[0], 54, 270, "#37474F", 40, 35);
 
@@ -216,16 +222,16 @@ document.addEventListener('DOMContentLoaded', function () {
         ctx.shadowColor = "transparent";
 
         ctx.fillStyle = textFillStyle;
-        ctx.fillText(text, x + paddingX, y + height / 2 + getTextHeight(ctx) / 2);
+        ctx.fillText(text, x + paddingX, y + height / 2 + getTextHeight(ctx, height - paddingY * 2) / 2);
     }
 
-    function getTextHeight(ctx) {
+    function getTextHeight(ctx, fallback) {
         let dummyTextBox = ctx.measureText("T");
-        return dummyTextBox.actualBoundingBoxAscent + dummyTextBox.actualBoundingBoxDescent;
+        return (dummyTextBox.actualBoundingBoxAscent + dummyTextBox.actualBoundingBoxDescent) || fallback;
     }
 
-    function bezierEaseOut(x) {
-        return 3 * (0.9) * Math.pow(1 - x, 2) * x + 3 * (1 - x) * Math.pow(x, 2) + (1) * Math.pow(x, 3);
+    function bezier(t, y0 = 1 / 3, y1 = 2 / 3) {
+        return 3 * (y0) * Math.pow(1 - t, 2) * t + 3 * y1 * (1 - t) * Math.pow(t, 2) + (1) * Math.pow(t, 3);
     }
 
 });

@@ -19,11 +19,14 @@
                 <div class="dropdown-menu w-100" style="max-height: 50vh; overflow-y: scroll;">
                     {{#each playlist.themes}}{{#with this.theme}}
                         <a class="dropdown-item" data-id="{{this.id}}">
-                            <h6 class="mb-0">
+                            <h6 class="mb-0 text-truncate">
                                 <span class="badge badge-secondary mr-1">{{this.typeString}}</span>
-                                {{this.title}}
+                                <span class="mr-1">{{this.series.title}}</span>
+                                {{#if this.series.aliasesString}}
+                                    <span class="text-muted">({{this.series.aliasesString}})</span>
+                                {{/if}}
                             </h6>
-                            <small class="text-muted">{{this.series.title}}</small>
+                            <small class="text-muted">{{this.title}}</small>
                         </a>
                     {{/with}}{{/each}}
                 </div>
@@ -142,3 +145,4 @@
 </form>
 
 <script defer src="/js/render.js"></script>
+<script defer src="/js/diagram.js"></script>

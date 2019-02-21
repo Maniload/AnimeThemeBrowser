@@ -127,6 +127,9 @@ exports.ranking = {
                     return;
                 }
 
+                // Sort by series title
+                playlist.themes = playlist.themes.sort((a, b) => a.theme.series.title.localeCompare(b.theme.series.title) || a.theme.index - b.theme.index);
+
                 let themes = playlist.themes;
                 let pages = [];
                 let rank = 1;

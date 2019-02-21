@@ -1,0 +1,23 @@
+<style>
+    @font-face {
+        font-family: Renogare;
+        src: url("../font/Renogare.otf");
+    }
+</style>
+
+<video src="https://animethemes.moe/video/ChuunibyouS2-ED1.webm" id="player" controls style="display: none;"></video>
+<canvas id="canvas" width="1920" height="1080"></canvas>
+<button class="render-button">Render</button>
+<button class="pause-button">Pause</button>
+
+<form class="ranking-form active">
+    <input type="hidden" class="series-input" value="Love, Chunibyo and Other Delusions! Heart Throb">
+    <input type="hidden" class="series-info-input" value="Winter 2014 &bull; Kyoto Animation">
+    <input type="hidden" class="theme-input" value="Van!shment Th!s World">
+    <input type="hidden" class="theme-info-input" value="ED1 &bull; Black Raison d'etre">
+    <input type="hidden" class="rank-info-input" value="Last Month: #23">
+</form>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="render.js"></script>
+<script src="diagram.js"></script>
